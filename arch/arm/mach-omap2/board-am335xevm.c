@@ -52,6 +52,8 @@
 #include <plat/usb.h>
 #include <plat/mmc.h>
 
+/* LCD controller is similar to DA850 */
+#include <video/da8xx-fb.h>
 #include <video/st7735fb.h>
 #include "board-flash.h"
 #include "cpuidle33xx.h"

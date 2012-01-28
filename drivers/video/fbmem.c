@@ -1590,6 +1590,7 @@ static int do_register_framebuffer(struct fb_info *fb_info)
 	atomic_set(&fb_info->count, 1);
 	mutex_init(&fb_info->lock);
 	mutex_init(&fb_info->mm_lock);
+	printk("Made it here: mutex)init\n");
 
 	fb_info->dev = device_create(fb_class, fb_info->device,
 				     MKDEV(FB_MAJOR, i), NULL, "fb%d", i);
@@ -1599,7 +1600,7 @@ static int do_register_framebuffer(struct fb_info *fb_info)
 		fb_info->dev = NULL;
 	} else
 		fb_init_device(fb_info);
-
+	printk("now made it here: fb_nit\n");
 	if (fb_info->pixmap.addr == NULL) {
 		fb_info->pixmap.addr = kmalloc(FBPIXMAPSIZE, GFP_KERNEL);
 		if (fb_info->pixmap.addr) {
@@ -1620,7 +1621,7 @@ static int do_register_framebuffer(struct fb_info *fb_info)
 
 	if (!fb_info->modelist.prev || !fb_info->modelist.next)
 		INIT_LIST_HEAD(&fb_info->modelist);
-
+	printk("Almost done\n");
 	fb_var_to_videomode(&mode, &fb_info->var);
 	fb_add_videomode(&mode, &fb_info->modelist);
 	registered_fb[i] = fb_info;
@@ -1628,8 +1629,11 @@ static int do_register_framebuffer(struct fb_info *fb_info)
 	event.info = fb_info;
 	if (!lock_fb_info(fb_info))
 		return -ENODEV;
+	printk("So close\n");
 	fb_notifier_call_chain(FB_EVENT_FB_REGISTERED, &event);
+	printk("done with fb_notifier\n");
 	unlock_fb_info(fb_info);
+	printk("done\n");
 	return 0;
 }
 

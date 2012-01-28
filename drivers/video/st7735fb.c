@@ -287,7 +287,7 @@ static void st7735fb_deferred_io(struct fb_info *info,
 static int st7735fb_init_display(struct st7735fb_par *par)
 {
 	/* TODO: Need some error checking on gpios */
-
+	printk("Ok made it to the init");
         /* Request GPIOs and initialize to default values */
         gpio_request_one(par->rst, GPIOF_OUT_INIT_HIGH,
 			"ST7735 Reset Pin");
@@ -393,13 +393,15 @@ static int __devinit st7735fb_probe (struct spi_device *spi)
 	struct fb_info *info;
 	struct st7735fb_par *par;
 	int retval = -ENOMEM;
-
+	
 	if (chip != ST7735_DISPLAY_AF_TFT18) {
 		pr_err("%s: only the %s device is supported\n", DRVNAME,
 			to_spi_driver(spi->dev.driver)->id_table->name);
 		return -EINVAL;
 	}
 
+	printk("%s: A %s display (%x) was found\n", DRVNAME,
+			to_spi_driver(spi->dev.driver)->id_table->name, chip);
 	if (!pdata) {
 		pr_err("%s: platform data required for rst and dc info\n",
 			DRVNAME);
@@ -445,11 +447,14 @@ static int __devinit st7735fb_probe (struct spi_device *spi)
 		return retval;
 	par->ssbuf = vmem;
 #endif
-
+	printk("registering framebuffer\n");
 	retval = register_framebuffer(info);
 	if (retval < 0)
+	{
+		printk("register_framebuffer failed with retval = %x", retval);
 		goto fbreg_fail;
-
+	}
+	printk("setting driver data for spi\n");
 	spi_set_drvdata(spi, info);
 
 	retval = st7735fb_init_display(par);
@@ -466,13 +471,15 @@ static int __devinit st7735fb_probe (struct spi_device *spi)
 	/* TODO: release gpios on fail */
 init_fail:
 	spi_set_drvdata(spi, NULL);
-
+	printk("%s: init_fail\n", DRVNAME);
+	
 fbreg_fail:
 	framebuffer_release(info);
+	printk("%s: fbreg_fail\n", DRVNAME);
 
 fballoc_fail:
 	vfree(vmem);
-
+	printk("%s: fb_alloc_fail\n", DRVNAME);
 	return retval;
 }
 
@@ -489,7 +496,7 @@ static int __devexit st7735fb_remove(struct spi_device *spi)
 	}
 
 	/* TODO: release gpios */
-
+	printk("%s: st7735fb_remove called!", DRVNAME);
 	return 0;
 }
 
